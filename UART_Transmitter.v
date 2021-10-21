@@ -7,7 +7,7 @@
 // Department:     Electronics and Communication Engineering, B.Tech
 // Author:         Harshal Chowdhary
 // Authors' Email: harshalchowdhary15@gmail.com
-// Create Date:    12:56:10 07/02/2021 
+// Create Date:    12:56:10 07/09/2021 
 // Module Name:    uart_transmiter 
 //////////////////////////////////////////////////////////////////////////////////
 // Release History
