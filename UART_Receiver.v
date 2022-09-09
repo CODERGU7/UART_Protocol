@@ -39,8 +39,6 @@ always @(posedge clk)
 begin
 	case(next_state)
 		IDLE: begin
-					clock_count <= 8'b0;
-					index <=3'b0;
 					next_state <= (dataserial==1'b0) ? START: IDLE;
 				end
 		
@@ -49,7 +47,6 @@ begin
 						begin
 							if(dataserial == 1'b0)
 								begin
-								clock_count<= 8'b0;
 								next_state <= DATABIT;
 								end
 							else 
@@ -57,7 +54,6 @@ begin
 							end
 					else
 						begin
-							clock_count <= clock_count +1'b1;
 							next_state  <= START;
 						end
 					end
@@ -65,22 +61,17 @@ begin
 		DATABIT: begin
 						if(clock_count < (CLOCKS_PER_BIT -1))
 							begin
-							clock_count <= clock_count + 1'b1;
 							next_state  <= DATABIT;
 							end
 						else
 							begin
-							clock_count <= 8'b0;
-							dataouts[index]<= dataserial;
 							
 							if(index < 3'b111)
 								begin
-								index <= index + 1'b1;
 								next_state <= DATABIT;
 								end
 							else
 								begin
-								index <= 3'b0;
 								next_state <= STOP;
 								end
 							end
@@ -91,7 +82,6 @@ begin
 						begin
 							if(dataserial == 1'b1)
 								begin
-									clock_count <= 8'b0;
 									next_state <= STOP;
 								end
 							else 
@@ -99,12 +89,71 @@ begin
 						end
 					else 
 						begin
-							clock_count <= clock_count + 1'b1;
 							next_state <= STOP;
 						end
 					end
 		default: next_state <= IDLE;
 	endcase
 end
+	
+	always @(next_state)
+		begin
+			case(next_state)
+				IDLE:
+					begin
+						clock_count = 8'b0;
+						index =3'b0;
+					end
+				START:
+					begin
+						if(clock_count == ((CLOCKS_PER_BIT - 1)/2))
+						begin
+							if(dataserial == 1'b0)
+								begin
+								clock_count = 8'b0;
+								end
+						else
+							begin
+								clock_count = clock_count +1'b1;
+							end
+						end
+					end
+				DATABIT:
+					begin
+						if(clock_count < (CLOCKS_PER_BIT -1))
+							begin
+							clock_count = clock_count + 1'b1;
+							end
+						else
+							begin
+							clock_count = 8'b0;
+							dataouts[index]= dataserial;
+							
+							if(index < 3'b111)
+								begin
+								index = index + 1'b1;
+								end
+							else
+								begin
+								index = 3'b0;
+								end
+							end
+					end
+				STOP:
+					begin
+						if(clock_count < (CLOCKS_PER_BIT -1))
+							begin
+								if(dataserial == 1'b1)
+									begin
+										clock_count = 8'b0;
+									end
+							end
+						else 
+							begin
+								clock_count = clock_count + 1'b1;
+							end
+					end
+			endcase
+		end
 	
 endmodule
